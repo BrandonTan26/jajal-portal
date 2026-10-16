@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>BrandRetailCortex.store - Client Portal</title>
+
+  <!-- PWA SUPPORT: MENGAKTIFKAN MENU INSTAL APLIKASI DI TITIK TIGA BROWSER HP -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#070a14">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BRC Store">
+  <link rel="apple-touch-icon" href="logo.jpeg">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg: #f4f6fc;
+      --card-bg: #ffffff;
+      --card-border: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --accent-grad: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%);
+      --primary: #6366f1;
+      --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+      --badge-bg: #f1f5f9;
+      --input-bg: #f8fafc;
+      --banner-grad: linear-gradient(135deg, #f1f3fd 0%, #eef2ff 100%);
+      --box-kredensial-bg: #fefce8;
+      --box-kredensial-border: #fef08a;
+      --warning-bg: #fffbeb;
+      --warning-border: #fde68a;
+      --warning-text: #b45309;
+    }
+    [data-theme="dark"] {
+      --bg: #070a14;
+      --card-bg: #0e1424;
+      --card-border: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-grad: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+      --primary: #8b5cf6;
+      --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      --badge-bg: #131c31;
+      --input-bg: #12192c;
+      --banner-grad: linear-gradient(135deg, #10162a 0%, #171f38 100%);
+      --box-kredensial-bg: #1c1a14;
+      --box-kredensial-border: #423815;
+      --warning-bg: #1f1b0d;
+      --warning-border: #4a3e14;
+      --warning-text: #fbbf24;
+    }
+    [data-theme="neon"] {
+      --bg: #020205;
+      --card-bg: #0a0b16;
+      --card-border: #ff007f;
+      --text: #00f0ff;
+      --text-muted: #ff77c6;
+      --accent-grad: linear-gradient(135deg, #ff007f 0%, #00f0ff 100%);
+      --primary: #ff007f;
+      --card-shadow: 0 0 25px rgba(255, 0, 127, 0.25);
+      --badge-bg: #15102a;
+      --input-bg: #120e24;
+      --banner-grad: linear-gradient(135deg, #150a24 0%, #091a2e 100%);
+      --box-kredensial-bg: #1a0f18;
+      --box-kredensial-border: #ff007f;
+      --warning-bg: #211200;
+      --warning-border: #ffb703;
+      --warning-text: #ffb703;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg); color: var(--text); min-height: 100vh; transition: 0.3s; overflow-x: hidden; }
+
+    /* LOADING SCREEN & SPINNER LOGO */
+    #loadingScreen {
+      position: fixed; inset: 0; background: var(--bg); z-index: 99999;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+    }
+    .spinner-wrap {
+      position: relative; width: 80px; height: 80px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .spinner-ring {
+      position: absolute; inset: 0; border-radius: 50%;
+      border: 3px solid transparent; border-top-color: #06b6d4; border-right-color: var(--primary);
+      animation: spin 0.9s linear infinite;
+    }
+    .spinner-logo-img {
+      width: 52px; height: 52px; border-radius: 50%; object-fit: cover;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    /* TOP NAVBAR */
+    .top-nav {
+      background: var(--card-bg); border-bottom: 1px solid var(--card-border);
+      padding: 10px 16px; display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100; gap: 8px;
+    }
+    .brand-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .brand-logo-nav {
+      width: 32px; height: 32px; border-radius: 8px; object-fit: cover;
+      border: 1px solid var(--card-border); flex-shrink: 0;
+    }
+    .brand-title { font-size: 13px; font-weight: 800; letter-spacing: 0.5px; white-space: nowrap; }
+    .status-pill-online {
+      background: rgba(16, 185, 129, 0.15); color: #10b981; font-size: 9px;
+      font-weight: 800; padding: 3px 8px; border-radius: 20px; white-space: nowrap;
+    }
+    .top-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .theme-toggle-box {
+      background: var(--input-bg); border: 1px solid var(--card-border);
+      border-radius: 20px; display: flex; padding: 2px; gap: 2px;
+    }
+    .theme-btn {
+      background: none; border: none; color: var(--text-muted); padding: 5px 8px;
+      border-radius: 12px; cursor: pointer; font-size: 12px;
+    }
+    .theme-btn.active { background: var(--accent-grad); color: #fff; }
+    .user-pill {
+      background: var(--input-bg); border: 1px solid var(--card-border);
+      padding: 5px 10px; border-radius: 10px; font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; gap: 6px; white-space: nowrap;
+    }
+    .kode-badge { background: #e0e7ff; color: #4338ca; padding: 2px 6px; border-radius: 6px; font-size: 9px; font-weight: 800; }
+    .btn-keluar {
+      border: 1px solid #fee2e2; background: #fff1f2; color: #e11d48;
+      padding: 6px 12px; border-radius: 10px; cursor: pointer; font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; gap: 4px; white-space: nowrap;
+    }
+
+    /* CONTAINER & CARDS */
+    .portal-container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 16px; }
+
+    #warningExpBanner {
+      background: var(--warning-bg); border: 1px solid var(--warning-border);
+      border-radius: 16px; padding: 14px 18px; margin-bottom: 16px; display: none;
+      align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    }
+    .warning-left { display: flex; align-items: center; gap: 10px; color: var(--warning-text); }
+
+    .welcome-card {
+      background: var(--banner-grad); border: 1px solid var(--card-border);
+      border-radius: 20px; padding: 22px; margin-bottom: 16px; box-shadow: var(--card-shadow);
+    }
+    .sub-badge {
+      display: inline-flex; align-items: center; gap: 6px; font-size: 10px;
+      font-weight: 800; color: #10b981; background: rgba(16, 185, 129, 0.12);
+      padding: 4px 10px; border-radius: 14px; margin-bottom: 12px;
+    }
+    .welcome-title { font-size: 26px; font-weight: 900; line-height: 1.2; margin-bottom: 8px; }
+    .welcome-title span { background: var(--accent-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .welcome-subtitle { color: var(--text-muted); font-size: 13px; margin-bottom: 16px; }
+    .welcome-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+    .pill {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      padding: 6px 10px; border-radius: 10px; font-size: 11px; font-weight: 600;
+      display: inline-flex; align-items: center; gap: 6px; color: var(--text-muted);
+    }
+
+    .card-info {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: var(--card-shadow);
+    }
+    .info-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+    .info-profile { display: flex; align-items: center; gap: 12px; }
+    .icon-store {
+      width: 44px; height: 44px; border-radius: 12px; background: var(--accent-grad);
+      color: white; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
+    }
+    .status-row { font-size: 12px; color: var(--text-muted); margin-bottom: 14px; line-height: 1.6; }
+    .perm-banner {
+      background: var(--banner-grad); border: 1px solid var(--card-border);
+      border-radius: 14px; padding: 14px 18px; display: flex; align-items: center; gap: 12px;
+    }
+
+    .modul-section-head {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 16px; flex-wrap: wrap; gap: 8px;
+    }
+    .modul-badge {
+      display: inline-flex; align-items: center; gap: 6px; font-size: 10px;
+      font-weight: 800; color: #6366f1; background: rgba(99, 102, 241, 0.12);
+      padding: 4px 10px; border-radius: 14px; margin-bottom: 4px;
+    }
+
+    .modules-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+    @media(max-width: 650px) {
+      .modules-grid { grid-template-columns: 1fr; }
+      .welcome-title { font-size: 22px; }
+      .top-nav { padding: 8px 12px; }
+      .user-pill span#topTokoName { max-width: 75px; overflow: hidden; text-overflow: ellipsis; }
+      .brand-title { display: none; }
+    }
+
+    .module-card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 20px; padding: 18px; display: flex; flex-direction: column;
+      justify-content: space-between; box-shadow: var(--card-shadow);
+    }
+    .mod-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+    .mod-icon-box {
+      width: 42px; height: 42px; border-radius: 12px; background: var(--input-bg);
+      border: 1px solid var(--card-border); display: flex; align-items: center; justify-content: center;
+      color: var(--primary); font-size: 18px;
+    }
+    .mod-title { font-size: 16px; font-weight: 800; margin-bottom: 4px; text-transform: uppercase; }
+    .mod-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-bottom: 14px; }
+
+    .kredensial-box {
+      background: var(--box-kredensial-bg); border: 1px solid var(--box-kredensial-border);
+      border-radius: 12px; padding: 12px; margin-bottom: 14px; font-size: 11px;
+    }
+    .kred-label { color: #d97706; font-weight: 700; margin-bottom: 6px; display: flex; justify-content: space-between; }
+    .kred-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .kred-pill {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      padding: 5px 8px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;
+      font-size: 10px; font-weight: 600;
+    }
+
+    .btn-open-modul {
+      width: 100%; padding: 12px; border: none; border-radius: 12px;
+      background: var(--accent-grad); color: white; font-weight: 800; font-size: 12px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+
+    #iframeViewerModal { position: fixed; inset: 0; background: var(--bg); z-index: 99998; display: none; flex-direction: column; }
+    .viewer-header {
+      height: 52px; background: var(--card-bg); border-bottom: 1px solid var(--card-border);
+      display: flex; align-items: center; justify-content: space-between; padding: 0 16px;
+    }
+    .iframe-box { flex: 1; width: 100%; height: calc(100vh - 52px); }
+    #internalFrame { width: 100%; height: 100%; border: none; }
+
+    #authContainer { max-width: 960px; margin: 20px auto; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 24px; align-items: center; }
+    @media(max-width: 850px){ #authContainer { grid-template-columns: 1fr; margin-top: 0; } }
+    .auth-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 24px; box-shadow: var(--card-shadow); }
+    .form-group { margin-bottom: 12px; }
+    .form-label { display: block; font-size: 10px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
+    .form-input, .form-select {
+      width: 100%; background: var(--input-bg); border: 1px solid var(--card-border);
+      padding: 10px 12px; border-radius: 10px; color: var(--text); outline: none; font-size: 13px;
+    }
+
+    .modern-footer { margin-top: 36px; padding-bottom: 24px; display: flex; flex-direction: column; gap: 16px; }
+    .footer-alert-card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 18px; padding: 18px; display: flex; gap: 14px;
+      box-shadow: var(--card-shadow); position: relative; overflow: hidden;
+    }
+    .footer-alert-card::before { content: ""; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--accent-grad); }
+    .footer-alert-icon {
+      width: 40px; height: 40px; border-radius: 12px; background: rgba(99, 102, 241, 0.1);
+      color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
+    }
+    .footer-alert-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+    .badge-internal { background: rgba(239, 68, 68, 0.12); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.25); font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 6px; }
+    .badge-system { background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.25); font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; }
+    .footer-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px; }
+    .footer-rules-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 700px) { .footer-rules-grid { grid-template-columns: 1fr; } .footer-alert-card { flex-direction: column; } }
+    .rule-item {
+      background: var(--input-bg); border: 1px solid var(--card-border);
+      border-radius: 10px; padding: 8px 12px; font-size: 11px; color: var(--text-muted);
+      display: flex; align-items: flex-start; gap: 8px; line-height: 1.4;
+    }
+    .footer-bottom-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 4px; border-top: 1px dashed var(--card-border); font-size: 11px;
+      color: var(--text-muted); flex-wrap: wrap; gap: 8px;
+    }
+
+    #expiredModal {
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(6px);
+      z-index: 100000; display: none; align-items: center; justify-content: center; padding: 16px;
+    }
+    .expired-card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 20px; padding: 28px 22px; max-width: 420px; width: 100%;
+      text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+    .expired-icon-wrap {
+      width: 56px; height: 56px; border-radius: 16px; background: rgba(239, 68, 68, 0.1);
+      color: #ef4444; display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px; font-size: 24px;
+    }
+    .expired-title { font-size: 17px; font-weight: 800; margin-bottom: 10px; }
+    .expired-msg { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; }
+    .btn-close-modal {
+      width: 100%; padding: 12px; border-radius: 10px; border: none;
+      background: var(--input-bg); color: var(--text); font-weight: 700; font-size: 12px; cursor: pointer;
+    }
+  </style>
+</head>
+<body data-theme="light">
+
+  <!-- SPINNER DENGAN LOGO ASLI (LOGO.JPEG) -->
+  <div id="loadingScreen">
+    <div class="spinner-wrap">
+      <div class="spinner-ring"></div>
+      <img src="logo.jpeg" alt="Logo" class="spinner-logo-img">
+    </div>
+    <span style="font-size: 11px; letter-spacing: 2px; font-weight: 700;">CONNECTING SECURE NODE...</span>
+  </div>
+
+  <div id="expiredModal">
+    <div class="expired-card">
+      <div class="expired-icon-wrap"><i class="fa-solid fa-lock"></i></div>
+      <h3 class="expired-title">Pemberitahuan Layanan Operasional</h3>
+      <p class="expired-msg" id="expiredModalMsg">
+        Masa berlaku langganan akses operasional toko Anda telah berakhir. Seluruh modul dan node sistem telah dinonaktifkan secara otomatis.<br><br>
+        Silakan menghubungi <strong>Administrator</strong> untuk mengajukan permohonan perpanjangan masa sewa layanan agar akses dapat diaktifkan kembali. Terima kasih atas kerja sama Anda.
+      </p>
+      <button class="btn-close-modal" onclick="closeExpiredModal()">Tutup & Kembali</button>
+    </div>
+  </div>
+
+  <!-- NAVBAR DENGAN LOGO ASLI (LOGO.JPEG) -->
+  <header class="top-nav">
+    <div class="brand-left">
+      <img src="logo.jpeg" alt="Logo Brand" class="brand-logo-nav">
+      <div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span class="brand-title">BRANDRETAILCORTEX.STORE</span>
+          <span class="status-pill-online">ONLINE</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <div class="theme-toggle-box">
+        <button class="theme-btn active" onclick="setTheme('light', this)"><i class="fa-solid fa-sun"></i></button>
+        <button class="theme-btn" onclick="setTheme('dark', this)"><i class="fa-solid fa-moon"></i></button>
+        <button class="theme-btn" onclick="setTheme('neon', this)"><i class="fa-solid fa-bolt"></i></button>
+      </div>
+
+      <div id="headerUserInfo" style="display:none; align-items:center; gap:6px;">
+        <div class="user-pill">
+          <span id="topTokoName">TOKO</span>
+          <span class="kode-badge" id="topTokoKode">-</span>
+        </div>
+        <button class="btn-keluar" onclick="handleLogout()"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 1. AUTH SCREEN -->
+  <section id="authSection" class="portal-container">
+    <div id="authContainer">
+      <div>
+        <div class="sub-badge"><i class="fa-solid fa-circle fa-2xs"></i> ENTERPRISE RETAIL OPERATING SYSTEM</div>
+        <h1 class="welcome-title">Selamat datang di<br><span>BrandRetailCortex.store</span></h1>
+        <p class="welcome-subtitle">Smart Retail. One Powerful Platform. <b>Manage. Monitor. Optimize.</b></p>
+        <div class="welcome-pills">
+          <div class="pill"><i class="fa-solid fa-bolt"></i> High-Speed Gateway</div>
+          <div class="pill"><i class="fa-solid fa-shield-halved"></i> Encrypted Node</div>
+          <div class="pill"><i class="fa-solid fa-mobile-screen"></i> 1 Akun = 1 Perangkat</div>
+        </div>
+      </div>
+
+      <div class="auth-card">
+        <div style="display:flex; background:var(--input-bg); border-radius:12px; padding:4px; margin-bottom:16px;">
+          <button id="tabBtnLogin" onclick="switchTab('login')" style="flex:1; padding:8px; border:none; border-radius:8px; background:var(--card-bg); font-weight:700; cursor:pointer; color:var(--text); font-size:12px;">Masuk</button>
+          <button id="tabBtnReg" onclick="switchTab('reg')" style="flex:1; padding:8px; border:none; border-radius:8px; background:transparent; font-weight:700; cursor:pointer; color:var(--text-muted); font-size:12px;">Daftar Baru</button>
+        </div>
+
+        <form id="formLogin" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label class="form-label">KODE TOKO</label>
+            <input type="text" id="loginKode" class="form-input" placeholder="Masukkan kode toko..." required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">PIN</label>
+            <input type="password" id="loginPin" class="form-input" placeholder="••••••" required>
+          </div>
+          <button type="submit" class="btn-open-modul" style="margin-top:12px;">Masuk ke Portal</button>
+        </form>
+
+        <form id="formRegister" style="display:none;" onsubmit="handleRegister(event)">
+          <div class="form-group">
+            <label class="form-label">KODE TOKO</label>
+            <input type="text" id="regKode" class="form-input" placeholder="Misal: MN11" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">NAMA TOKO</label>
+            <input type="text" id="regNama" class="form-input" placeholder="Nama Toko..." required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">NO. WHATSAPP</label>
+            <input type="text" id="regWa" class="form-input" placeholder="08xxxxxxxxxx" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">PIN BARU</label>
+            <input type="password" id="regPin" class="form-input" placeholder="6 digit PIN" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">DURASI BERLANGGANAN</label>
+            <select id="regDurasi" class="form-select">
+              <option value="1 BULAN">1 Bulan</option>
+              <option value="3 BULAN">3 Bulan</option>
+              <option value="6 BULAN">6 Bulan</option>
+              <option value="PERMANENT">Permanent</option>
+            </select>
+          </div>
+          <button type="submit" class="btn-open-modul" style="margin-top:12px;"><i class="fa-solid fa-location-crosshairs"></i> Konfirmasi Lokasi & Daftar</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. DASHBOARD PORTAL CLIENT -->
+  <main id="portalDashboard" class="portal-container" style="display:none;">
+    
+    <div id="warningExpBanner">
+      <div class="warning-left">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <div>
+          <strong style="display:block; font-size:12px;">Pemberitahuan Masa Berlaku Akses</strong>
+          <span style="font-size:11px;" id="warningExpMsg">Masa sewa layanan akan segera berakhir.</span>
+        </div>
+      </div>
+      <div>
+        <span class="kode-badge" style="background:#fef3c7; color:#92400e; padding:4px 8px; font-size:10px;" id="badgeSisaHari">Sisa: - Hari</span>
+      </div>
+    </div>
+
+    <section class="welcome-card">
+      <div class="sub-badge"><i class="fa-solid fa-circle fa-2xs"></i> ENTERPRISE RETAIL SYSTEM</div>
+      <h1 class="welcome-title">WELCOME TO <span>BRANDRETAILCORTEX.STORE</span></h1>
+      <p class="welcome-subtitle">Smart Retail. One Powerful Platform... <b>Manage. Monitor. Optimize.</b></p>
+      <div class="welcome-pills">
+        <div class="pill"><i class="fa-solid fa-bolt"></i> High-Speed Gateway</div>
+        <div class="pill"><i class="fa-solid fa-rotate"></i> Realtime Sync</div>
+        <div class="pill"><i class="fa-solid fa-layer-group"></i> Multi-User Auth</div>
+      </div>
+    </section>
+
+    <section class="card-info">
+      <div class="info-header">
+        <div class="info-profile">
+          <div class="icon-store"><i class="fa-solid fa-store"></i></div>
+          <div>
+            <div style="display:flex; align-items:center; gap:6px; margin-bottom:2px;">
+              <span style="font-size:9px; font-weight:800; color:#6366f1; background:#e0e7ff; padding:2px 6px; border-radius:8px;">IDENTITAS TOKO</span>
+              <i class="fa-solid fa-circle fa-2xs" style="color:#10b981;"></i>
+            </div>
+            <h2 style="font-size:18px; font-weight:900;" id="cardTokoName">TOKO</h2>
+            <div style="font-size:11px; color:var(--text-muted); font-weight:700;">KODE: <span id="cardTokoKode" class="kode-badge">-</span></div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:8px;">
+          <button class="btn-keluar" onclick="handleLogout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Ganti Toko</button>
+        </div>
+      </div>
+
+      <div class="status-row">
+        <b>STATUS LAYANAN LANGGANAN:</b> <span class="status-pill-online" id="statusBadge">• Aktif</span><br>
+        Paket: <b id="paketTxt">-</b>. Akses seluruh modul operasional ritel aktif terhubung realtime.<br>
+        <span style="font-size:11px; margin-top:2px; display:inline-block;">
+          <i class="fa-regular fa-calendar-check"></i> Jatuh Tempo: <span id="tglBerakhir">-</span>
+        </span>
+      </div>
+
+      <div class="perm-banner">
+        <i class="fa-solid fa-infinity fa-lg" style="color:#6366f1;" id="bannerExpIcon"></i>
+        <div>
+          <h4 style="font-size:13px; font-weight:800;" id="bannerExpTitle">AKSES PERMANEN AKTIF</h4>
+          <p style="font-size:11px; color:var(--text-muted);" id="bannerExpSub">Tanpa Batas Waktu Kadaluarsa</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="modul-section-head">
+        <div>
+          <div class="modul-badge"><i class="fa-solid fa-tower-broadcast"></i> <span id="totalModulBadge">0 MODUL UTAMA</span></div>
+          <h2 style="font-size:18px; font-weight:900;">Pusat Ruang Kerja Operasional Toko</h2>
+        </div>
+      </div>
+
+      <div class="modules-grid" id="modulesContainer"></div>
+    </section>
+
+    <footer class="modern-footer">
+      <div class="footer-alert-card">
+        <div class="footer-alert-icon"><i class="fa-solid fa-shield-halved"></i></div>
+        <div style="flex:1;">
+          <div class="footer-alert-header">
+            <span class="badge-internal"><i class="fa-solid fa-lock"></i> INTERNAL USE ONLY</span>
+            <span class="badge-system"><i class="fa-solid fa-shield-check"></i> SECURE NODE</span>
+          </div>
+          <p class="footer-desc">Platform dibuat untuk mempercepat, mempermudah, dan meningkatkan akurasi operasional toko.</p>
+          <div class="footer-rules-grid">
+            <div class="rule-item"><i class="fa-solid fa-triangle-exclamation"></i><span>Dilarang menyebarluaskan link / akun kepada pihak luar tanpa izin.</span></div>
+            <div class="rule-item"><i class="fa-solid fa-arrow-right-from-bracket"></i><span>Pastikan logout setelah selesai menggunakan modul.</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom-bar">
+        <span style="font-weight:700;"><i class="fa-solid fa-cube" style="color:var(--primary);"></i> BrandRetailCortex.store</span>
+        <span>© 2026 Enterprise OS v2.4</span>
+      </div>
+    </footer>
+  </main>
+
+  <!-- MODAL VIEWER (IZIN DOWNLOAD PDF AKTIF) -->
+  <div id="iframeViewerModal">
+    <div class="viewer-header">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <button onclick="closeModuleViewer()" style="background:var(--input-bg); border:1px solid var(--card-border); color:var(--text); padding:6px 10px; border-radius:8px; cursor:pointer; font-weight:700; font-size:11px;">
+          <i class="fa-solid fa-arrow-left"></i> Kembali
+        </button>
+        <span style="font-weight:800; font-size:12px;" id="viewerModulTitle">MODUL</span>
+      </div>
+      <span class="status-pill-online"><i class="fa-solid fa-shield-halved"></i> SECURE SESSION</span>
+    </div>
+    <div class="iframe-box">
+      <iframe id="internalFrame" sandbox="allow-scripts allow-forms allow-same-origin allow-downloads allow-popups allow-popups-to-escape-sandbox"></iframe>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbzuN1LXzT2Jh963ob1LnxuxBdGsjzk6fNbP7hd-oggHZtHtiXuo9nAs47z1yrFqfOo1kQ/exec";
+
+    // REGISTRASI SERVICE WORKER AGAR MENDUKUNG OPSI "INSTAL APLIKASI" DI CHROME
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(() => console.log("PWA Service Worker Aktif"))
+          .catch((err) => console.log("SW Error:", err));
+      });
+    }
+
+    let localDeviceId = localStorage.getItem("_brc_device_id");
+    if (!localDeviceId) {
+      localDeviceId = 'DEV-' + Math.random().toString(36).substring(2, 9).toUpperCase() + '-' + Date.now();
+      localStorage.setItem("_brc_device_id", localDeviceId);
+    }
+
+    function setTheme(mode, elem) {
+      document.body.setAttribute('data-theme', mode);
+      document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+      if (elem) elem.classList.add('active');
+    }
+
+    function switchTab(t) {
+      if(t === 'login'){
+        document.getElementById('formLogin').style.display = 'block';
+        document.getElementById('formRegister').style.display = 'none';
+        document.getElementById('tabBtnLogin').style.background = 'var(--card-bg)';
+        document.getElementById('tabBtnLogin').style.color = 'var(--text)';
+        document.getElementById('tabBtnReg').style.background = 'transparent';
+        document.getElementById('tabBtnReg').style.color = 'var(--text-muted)';
+      } else {
+        document.getElementById('formLogin').style.display = 'none';
+        document.getElementById('formRegister').style.display = 'block';
+        document.getElementById('tabBtnReg').style.background = 'var(--card-bg)';
+        document.getElementById('tabBtnReg').style.color = 'var(--text)';
+        document.getElementById('tabBtnLogin').style.background = 'transparent';
+        document.getElementById('tabBtnLogin').style.color = 'var(--text-muted)';
+      }
+    }
+
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.onkeydown = function(e) {
+      if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || (e.ctrlKey && e.keyCode == 85)) {
+        return false;
+      }
+    };
+
+    function showExpiredNotice(customMsg) {
+      if (customMsg) {
+        document.getElementById('expiredModalMsg').innerHTML = customMsg;
+      }
+      document.getElementById('expiredModal').style.display = 'flex';
+    }
+    function closeExpiredModal() {
+      document.getElementById('expiredModal').style.display = 'none';
+    }
+
+    async function checkServerAccountStatus(user) {
+      try {
+        const res = await fetch(`${API_URL}?action=check_status&kode_toko=${encodeURIComponent(user.kode_toko)}&device_id=${encodeURIComponent(localDeviceId)}&_t=${Date.now()}`);
+        const data = await res.json();
+        
+        if (!data.valid) {
+          localStorage.removeItem('_brc_user');
+          document.getElementById('portalDashboard').style.display = 'none';
+          document.getElementById('authSection').style.display = 'block';
+          document.getElementById('headerUserInfo').style.display = 'none';
+          document.getElementById('loadingScreen').style.display = 'none';
+
+          showExpiredNotice(data.message || "Akses akun toko telah dinonaktifkan oleh Administrator.");
+          return false;
+        }
+        return true;
+      } catch (err) {
+        return true;
+      }
+    }
+
+    window.addEventListener('load', async () => {
+      const savedUser = localStorage.getItem('_brc_user');
+      if (savedUser) {
+        const user = JSON.parse(savedUser);
+        const isValid = await checkServerAccountStatus(user);
+        if (isValid) {
+          showDashboard(user);
+        }
+      } else {
+        document.getElementById('loadingScreen').style.display = 'none';
+      }
+    });
+
+    setInterval(async () => {
+      const savedUser = localStorage.getItem('_brc_user');
+      if (savedUser) {
+        const user = JSON.parse(savedUser);
+        await checkServerAccountStatus(user);
+      }
+    }, 10000);
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      document.getElementById('loadingScreen').style.display = 'flex';
+
+      if (!navigator.geolocation) {
+        alert("Perangkat Anda tidak mendukung sensor GPS.");
+        document.getElementById('loadingScreen').style.display = 'none';
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const payload = {
+          kode_toko: document.getElementById('regKode').value,
+          nama_toko: document.getElementById('regNama').value,
+          no_wa: document.getElementById('regWa').value,
+          pin: document.getElementById('regPin').value,
+          durasi: document.getElementById('regDurasi').value,
+          device_id: localDeviceId,
+          device_info: navigator.userAgent,
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude
+        };
+
+        try {
+          const res = await fetch(`${API_URL}?action=register`, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+          });
+          const resData = await res.json();
+          alert(resData.message);
+          if (resData.success) switchTab('login');
+        } catch(err) {
+          alert("Gagal menghubungi server Google Sheets!");
+        }
+        document.getElementById('loadingScreen').style.display = 'none';
+      }, (err) => {
+        alert("Wajib mengizinkan akses lokasi/GPS untuk verifikasi toko!");
+        document.getElementById('loadingScreen').style.display = 'none';
+      }, { enableHighAccuracy: true });
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      document.getElementById('loadingScreen').style.display = 'flex';
+
+      const payload = {
+        kode_toko: document.getElementById('loginKode').value,
+        pin: document.getElementById('loginPin').value,
+        device_id: localDeviceId,
+        device_info: navigator.userAgent
+      };
+
+      try {
+        const res = await fetch(`${API_URL}?action=login`, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        const resData = await res.json();
+        if (resData.success) {
+          localStorage.setItem('_brc_user', JSON.stringify(resData.user));
+          showDashboard(resData.user);
+        } else {
+          if (resData.message && resData.message.toLowerCase().includes("habis")) {
+            showExpiredNotice();
+          } else {
+            alert(resData.message);
+          }
+        }
+      } catch(err) {
+        alert("Koneksi gagal.");
+      }
+      document.getElementById('loadingScreen').style.display = 'none';
+    }
+
+    async function showDashboard(user) {
+      document.getElementById('authSection').style.display = 'none';
+      document.getElementById('headerUserInfo').style.display = 'flex';
+      document.getElementById('portalDashboard').style.display = 'block';
+
+      document.getElementById('topTokoName').innerText = user.nama_toko;
+      document.getElementById('topTokoKode').innerText = 'KODE: ' + user.kode_toko;
+      document.getElementById('cardTokoName').innerText = user.nama_toko;
+      document.getElementById('cardTokoKode').innerText = user.kode_toko;
+      document.getElementById('paketTxt').innerText = user.durasi;
+
+      const bannerWarning = document.getElementById('warningExpBanner');
+      if (user.durasi !== 'PERMANENT' && user.expired_at) {
+        const now = new Date();
+        const expDate = new Date(user.expired_at);
+        const diffDays = Math.ceil((expDate - now) / (1000 * 60 * 60 * 24));
+
+        if (diffDays <= 7 && diffDays > 0) {
+          bannerWarning.style.display = 'flex';
+          document.getElementById('badgeSisaHari').innerText = `Sisa: ${diffDays} Hari`;
+          document.getElementById('warningExpMsg').innerText = `Masa berlaku layanan toko Anda tersisa ${diffDays} hari lagi. Mohon koordinasi dengan Administrator.`;
+        } else {
+          bannerWarning.style.display = 'none';
+        }
+      } else {
+        bannerWarning.style.display = 'none';
+      }
+
+      if (user.durasi === 'PERMANENT') {
+        document.getElementById('bannerExpTitle').innerText = 'AKSES PERMANEN AKTIF';
+        document.getElementById('bannerExpSub').innerText = 'Tanpa Batas Waktu Kadaluarsa';
+        document.getElementById('tglBerakhir').innerText = 'Permanen';
+        document.getElementById('bannerExpIcon').className = 'fa-solid fa-infinity fa-lg';
+      } else {
+        const expFormatted = user.expired_at ? new Date(user.expired_at).toLocaleDateString('id-ID', {day:'numeric', month:'short', year:'numeric'}) : '-';
+        document.getElementById('bannerExpTitle').innerText = 'AKSES BERLANGGANAN AKTIF';
+        document.getElementById('bannerExpSub').innerText = 'Berlaku hingga: ' + expFormatted;
+        document.getElementById('tglBerakhir').innerText = expFormatted;
+        document.getElementById('bannerExpIcon').className = 'fa-solid fa-calendar-check fa-lg';
+      }
+
+      await loadModulesClient(user);
+      document.getElementById('loadingScreen').style.display = 'none';
+    }
+
+    async function loadModulesClient(user) {
+      const res = await fetch(`${API_URL}?action=get_modules_client&_t=${Date.now()}`);
+      const data = await res.json();
+      const container = document.getElementById('modulesContainer');
+      container.innerHTML = '';
+
+      const iconList = ['fa-chart-simple', 'fa-file-lines', 'fa-magnifying-glass', 'fa-print', 'fa-boxes-stacked', 'fa-cash-register'];
+
+      if (data.modules && data.modules.length > 0) {
+        document.getElementById('totalModulBadge').innerText = `${data.modules.length} MODUL UTAMA`;
+
+        data.modules.forEach((mod, index) => {
+          const randomIcon = iconList[index % iconList.length];
+          const card = document.createElement('div');
+          card.className = 'module-card';
+          card.innerHTML = `
+            <div>
+              <div class="mod-top">
+                <div class="mod-icon-box"><i class="fa-solid ${randomIcon}"></i></div>
+                <span class="status-pill-online"><i class="fa-solid fa-circle fa-2xs"></i> ONLINE</span>
+              </div>
+              <h3 class="mod-title">${mod.nama_modul}</h3>
+              <p class="mod-desc">Integrasi sistem ${mod.nama_modul} terhubung langsung dengan basis data toko.</p>
+
+              <div class="kredensial-box">
+                <div class="kred-label">
+                  <span><i class="fa-solid fa-shield-halved"></i> KREDENSIAL KHUSUS MODUL</span>
+                  <span style="font-size:9px;">TERKUNCI OTOMATIS</span>
+                </div>
+                <div class="kred-inputs">
+                  <div class="kred-pill">
+                    <span>ID: ${user.kode_toko}</span>
+                    <i class="fa-regular fa-copy" style="cursor:pointer;" onclick="copyText('${user.kode_toko}')"></i>
+                  </div>
+                  <div class="kred-pill">
+                    <span>PIN: ******</span>
+                    <i class="fa-solid fa-lock"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn-open-modul" onclick="openInternalModule('${mod.nama_modul}', '${mod.url}')">
+              <i class="fa-solid fa-bolt"></i> BUKA RUANG KERJA MODUL
+            </button>
+          `;
+          container.appendChild(card);
+        });
+      } else {
+        document.getElementById('totalModulBadge').innerText = `0 MODUL`;
+        container.innerHTML = `
+          <div style="grid-column: 1/-1; text-align:center; padding:36px; background:var(--card-bg); border-radius:18px; border:1px solid var(--card-border);">
+            <i class="fa-solid fa-folder-open fa-2x" style="color:var(--text-muted); margin-bottom:8px;"></i>
+            <h4 style="font-size:14px;">Belum Ada Modul Ditambahkan</h4>
+            <p style="color:var(--text-muted); font-size:12px; margin-top:2px;">Admin owner belum mendaftarkan tautan modul web operasional.</p>
+          </div>
+        `;
+      }
+    }
+
+    function openInternalModule(nama, url) {
+      document.getElementById('viewerModulTitle').innerText = nama.toUpperCase();
+      document.getElementById('internalFrame').src = url;
+      document.getElementById('iframeViewerModal').style.display = 'flex';
+    }
+
+    function closeModuleViewer() {
+      document.getElementById('internalFrame').src = '';
+      document.getElementById('iframeViewerModal').style.display = 'none';
+    }
+
+    function copyText(txt) {
+      navigator.clipboard.writeText(txt);
+      alert("Tersalin: " + txt);
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('_brc_user');
+      location.reload();
+    }
+  </script>
+</body>
+</html>
